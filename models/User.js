@@ -20,6 +20,18 @@ const userSchema = new mongoose.Schema({
     githubId: {
         type: String,
     },
+    isVerified: {
+        type: Boolean,
+        default: false,
+    },
+    resetPasswordToken: {
+        type: String,
+    },
+    resetPasswordExpires: {
+        type: Date,
+    },
+}, {
+    timestamps: true,
 });
 
 export default mongoose.model('User', userSchema);

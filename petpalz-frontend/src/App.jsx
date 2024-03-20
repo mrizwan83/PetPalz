@@ -1,7 +1,7 @@
 // src/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import PetList from './components/PetList';
+import HomePage from './components/HomePage';
 
 const App = () => {
   return (
@@ -14,7 +14,8 @@ const App = () => {
         </header>
         <main className="container mx-auto py-8">
           <Routes>
-            <Route path="/" element={<PetList />} />
+            {/* <Route path="/" element={<PetList />} /> */}
+            <Route path="/" element={<HomePage />} />
             Add more routes as needed
           </Routes>
         </main>

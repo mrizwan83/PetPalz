@@ -23,16 +23,21 @@ const PetList = () => {
     return (
         <div className="container mx-auto">
             <h2 className="text-2xl font-bold mb-4">My Pets</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* {userPets.map((pet) => (
-                    <div key={pet._id} className="bg-white rounded-lg shadow-md p-4">
-                        <h3 className="text-xl font-semibold">{pet.name}</h3>
-                        <p className="text-gray-500">Species: {pet.species}</p>
-                        <p className="text-gray-500">Breed: {pet.breed}</p>
-                        <p className="text-gray-500">Age: {pet.age}</p>
-                    </div>
-                ))} */}
-            </div>
+            {userPets.length === 0 ? (
+                <p>No pets found.</p>
+            ) : (
+                // <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                //     {userPets.map((pet) => (
+                //         <div key={pet._id} className="bg-white rounded-lg shadow-md p-4">
+                //             <h3 className="text-xl font-semibold">{pet.name}</h3>
+                //             <p className="text-gray-500">Species: {pet.species}</p>
+                //             <p className="text-gray-500">Breed: {pet.breed}</p>
+                //             <p className="text-gray-500">Age: {pet.age}</p>
+                //         </div>
+                //     ))}
+                // </div>
+                null
+            )}
         </div>
     );
 };

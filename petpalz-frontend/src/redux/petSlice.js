@@ -9,8 +9,12 @@ export const fetchUserPets = createAsyncThunk(
             const response = await axios.get(`/api/pets/user/${userId}`, {
                 params: { page, limit, sort },
             });
+            console.log(response)
             return response.data;
         } catch (error) {
+            if (error.response && error.response.status === 404) {
+                return []; // Return an empty array if no pets are found for the user
+            }
             return rejectWithValue(error.response.data);
         }
     }
