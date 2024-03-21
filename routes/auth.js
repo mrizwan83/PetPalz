@@ -3,6 +3,7 @@ import express from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import { sendEmailVerification, sendPasswordResetEmail } from '../utils/emailService.js';
 
 const router = express.Router();
 
@@ -28,11 +29,46 @@ router.post('/register', async (req, res) => {
         });
 
         // Save the user to the database
-        await newUser.save();
+        const savedUser = await newUser.save();
 
-        res.status(201).json({ message: 'User registered successfully' });
+        // Generate email verification token
+        const verificationToken = jwt.sign(
+            { userId: savedUser._id },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
+        // Send email verification
+        await sendEmailVerification(savedUser.email, verificationToken);
+
+        res.status(201).json({ message: 'User registered successfully. Please verify your email.' });
     } catch (error) {
         console.error('Error registering user:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Email verification route
+router.get('/verify-email', async (req, res) => {
+    try {
+        const { token } = req.query;
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decodedToken.userId;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        if (user.isVerified) {
+            return res.status(400).json({ message: 'Email already verified' });
+        }
+
+        user.isVerified = true;
+        await user.save();
+
+        res.json({ message: 'Email verified successfully' });
+    } catch (error) {
+        console.error('Error verifying email:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
@@ -118,6 +154,77 @@ router.post('/github', async (req, res) => {
         res.json({ token });
     } catch (error) {
         console.error('Error logging in with GitHub:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+
+// Request password reset
+router.post('/forgot-password', async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Generate password reset token
+        const resetToken = jwt.sign(
+            { userId: user._id },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
+        // Save the reset token and expiry to the user document
+        user.resetPasswordToken = resetToken;
+        user.resetPasswordExpires = Date.now() + 3600000; // 1 hour from now
+        await user.save();
+
+        // Send password reset email
+        await sendPasswordResetEmail(user.email, resetToken);
+
+        res.json({ message: 'Password reset email sent' });
+    } catch (error) {
+        console.error('Error requesting password reset:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Reset password
+router.post('/reset-password', async (req, res) => {
+    try {
+        const { token, password } = req.body;
+
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decodedToken.userId;
+
+        const user = await User.findOne({
+            _id: userId,
+            resetPasswordToken: token,
+            resetPasswordExpires: { $gt: Date.now() },
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid or expired token' });
+        }
+
+        if (!password || password.trim().length === 0) {
+            return res.status(400).json({ message: 'Password cannot be empty' });
+        }
+
+        // Hash the new password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Update the user's password and clear the reset token
+        user.password = hashedPassword;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+        await user.save();
+
+        res.json({ message: 'Password reset successful' });
+    } catch (error) {
+        console.error('Error resetting password:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
