@@ -2,7 +2,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import HomePage from './components/HomePage';
-
+import LoginForm from './components/LoginForm';
 const App = () => {
   return (
     <Router>
@@ -16,6 +16,7 @@ const App = () => {
           <Routes>
             {/* <Route path="/" element={<PetList />} /> */}
             <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginForm />} />
             Add more routes as needed
           </Routes>
         </main>
