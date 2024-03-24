@@ -48,19 +48,16 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// Email verification route
-router.get('/verify-email', async (req, res) => {
+// routes/auth.js
+router.post('/verify-email', async (req, res) => {
     try {
-        const { token } = req.query;
+        const { token } = req.body;
         const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decodedToken.userId;
 
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
-        }
-        if (user.isVerified) {
-            return res.status(400).json({ message: 'Email already verified' });
         }
 
         user.isVerified = true;
@@ -69,7 +66,7 @@ router.get('/verify-email', async (req, res) => {
         res.json({ message: 'Email verified successfully' });
     } catch (error) {
         console.error('Error verifying email:', error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Error verifying email' });
     }
 });
 

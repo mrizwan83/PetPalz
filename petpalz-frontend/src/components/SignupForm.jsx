@@ -8,10 +8,18 @@ const SignupForm = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [signupSuccess, setSignupSuccess] = useState(false);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        dispatch(signupUser({ name, email, password }));
+        try {
+            const result = await dispatch(signupUser({ name, email, password })).unwrap();
+            console.log('Signup result:', result);
+            setSignupSuccess(true);
+        } catch (error) {
+            console.error('Error signing up:', error);
+            // Handle error case
+        }
     };
 
     return (
@@ -64,6 +72,12 @@ const SignupForm = () => {
                     Signup
                 </button>
             </form>
+            {signupSuccess && (
+                <div>
+                    <p>Registration successful! Please check your email to verify your account.</p>
+                    <p>If you don't see the verification email, please check your spam folder.</p>
+                </div>
+            )}
         </div>
     );
 };

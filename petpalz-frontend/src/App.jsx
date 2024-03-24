@@ -4,6 +4,8 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import HomePage from './components/HomePage';
 import LoginForm from './components/LoginForm';
 import SignupForm from './components/SignupForm';
+import EmailVerified from './components/EmailVerified';
+import VerifyEmail from './components/VerifyEmail';
 const App = () => {
   return (
     <Router>
@@ -19,6 +21,8 @@ const App = () => {
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/signup" element={<SignupForm />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/email-verified" element={<EmailVerified />} />
             Add more routes as needed
           </Routes>
         </main>
