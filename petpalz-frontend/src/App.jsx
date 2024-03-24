@@ -3,6 +3,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import HomePage from './components/HomePage';
 import LoginForm from './components/LoginForm';
+import SignupForm from './components/SignupForm';
 const App = () => {
   return (
     <Router>
@@ -17,6 +18,7 @@ const App = () => {
             {/* <Route path="/" element={<PetList />} /> */}
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginForm />} />
+            <Route path="/signup" element={<SignupForm />} />
             Add more routes as needed
           </Routes>
         </main>
